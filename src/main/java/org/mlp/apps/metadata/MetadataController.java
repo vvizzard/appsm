@@ -291,6 +291,7 @@ public class MetadataController {
         if(publisher != null) post.setPublisher(publisher);
         post.setRights(rights);
         if(year != null) post.setYear(year);
+        else post.setYear(getYear(date));
         post.setType(type);
         if(url != null) post.setUrl(url);
 
@@ -329,7 +330,8 @@ public class MetadataController {
 //        System.out.println("tralalalalala" + token);
 //        System.out.println(token.substring(token.indexOf(",.5")+3));
 //        System.out.println(Integer.parseInt(token.substring(token.indexOf(",.5")+3)));
-        Optional<User> currentUser = userRepository.findById(Integer.parseInt(token.substring(token.indexOf(",.5")+3)));
+        Optional<User> currentUser = userRepository.findById(Integer.parseInt(
+        		token.substring(token.indexOf(",.5")+3)));
         System.out.println("mail");
         Date now = Calendar.getInstance().getTime();
 
@@ -340,7 +342,10 @@ public class MetadataController {
             String filename = file.getOriginalFilename().replaceAll("\\s+", "");
             filename = Normalizer.normalize(filename, Normalizer.Form.NFD);
             filename = filename.replaceAll("[^\\p{ASCII}]", "");
-            String path = context.getRealPath("/") + File.separator + "resources"
+            String path = context.getRealPath("/").substring(0, 
+            		context.getRealPath("/").substring(0, context.getRealPath("/")
+            				.length()-1).lastIndexOf(File.separator)) 
+            		+ File.separator + "forum" + File.separator + "resources"
                     + File.separator + "upload" + File.separator + additionalName
                     + filename;
             // Add the url path 
