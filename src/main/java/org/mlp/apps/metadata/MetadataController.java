@@ -17,6 +17,8 @@ import java.util.regex.PatternSyntaxException;
 import javax.servlet.ServletContext;
 
 import org.mlp.apps.photo.Photo;
+import org.mlp.apps.photo.PhotoBreakpoint;
+import org.mlp.apps.photo.PhotoBreakpointRepository;
 import org.mlp.apps.photo.PhotoRepository;
 import org.mlp.apps.photo.PhotoService;
 import org.mlp.apps.user.User;
@@ -49,6 +51,9 @@ public class MetadataController {
 	
 	@Autowired
 	private PhotoRepository photoRepository;
+	
+	@Autowired
+	private PhotoBreakpointRepository photoBreakpointRepository;
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -120,9 +125,16 @@ public class MetadataController {
 			photoService.preparePhoto(photo, file.getBytes());
 			
 			metadata = metadataRepository.save(metadata);
+			metadata.setUrl(photo.getLink());
+			metadata.setIdUtilisateur(Integer.getInteger(token.substring(token.indexOf(",.5")+1)));
 			photo.setIdMetadata(metadata.getId());
 			
-			photoRepository.save(photo);
+			photo = photoRepository.save(photo);
+			for (PhotoBreakpoint p : photo.getBreakpoints()) {
+				p.setIdPhoto(photo.getId());
+			}
+			
+			photoBreakpointRepository.saveAll(photo.getBreakpoints());
 			
 			response = Boolean.TRUE;
 		} catch (Exception e) {
@@ -133,83 +145,83 @@ public class MetadataController {
 		return response;
 	}
 	
-	@PostMapping("/user/document")
-	public Boolean addDoc(@RequestParam("idUser") Integer idUser, 
-			@RequestParam("date") String date, @RequestParam("coverage") String coverage, 
-			@RequestParam("title") String title, @RequestParam("creator") String creator, 
-			@RequestParam("rights") String rights, @RequestParam("type") String type, 
-			@RequestParam(name = "url", required = false) String url, 
-            @RequestParam(name = "file", required = false) MultipartFile file) {
-		
-		Boolean response = false;
-		
-		try {
-			Metadata metadata = new Metadata();
-			metadata.setBibliographicResource("");
-			metadata.setDescription("");
-			metadata.setLanguage("");
-			metadata.setRelation("");
-			metadata.setSource("");
-			metadata.setSubject("");
-			metadata.setFormat("");
-			metadata.setFileFormat("");
-			metadata.setIdentifier("");
-			metadata.setContributor("");
-			metadata.setPublisher("");
-			metadata.setType(type);
-			
-			metadata.setDate(date);
-			metadata.setYear(getYear(date));
-			metadata.setCoverage(coverage);
-			metadata.setTitle(title);
-			metadata.setCreator(creator);
-			metadata.setRights(rights);
-			
-			if (null != file && !file.isEmpty()) {
-	            String additionalName = "";
-	            additionalName += Calendar.getInstance().getTime().getTime();
-	            String filename = file.getOriginalFilename().replaceAll("\\s+", "");
-	            filename = Normalizer.normalize(filename, Normalizer.Form.NFD);
-	            filename = filename.replaceAll("[^\\p{ASCII}]", "");
-	            String path = context.getRealPath("/") + File.separator + "resources"
-	                    + File.separator + "upload" + File.separator + additionalName
-	                    + filename;
-	            // Add the url path 
-	            metadata.setUrl("https://www.lemursporal.org/forum/" + "resources" + "/"
-	                    + "upload" + "/" + additionalName + filename);
-	            if (!Files.exists(Paths.get(context.getRealPath("/"), File.separator,
-	                    "resources", File.separator, "upload"), LinkOption.NOFOLLOW_LINKS)) {
-	                try {
-	                    Files.createDirectories(Paths.get(context.getRealPath("/"),
-	                            File.separator, "resources", File.separator,
-	                            "upload"));
-	                } catch (IOException e) {
-	                    // TODO Auto-generated catch block
-	                    e.printStackTrace();
-	                }
-	            }
-	            try {
-	                byte[] bytes = file.getBytes();
-	                BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(path)));
-	                stream.write(bytes);
-	                stream.close();
-	            } catch (Exception e) {
-	            	e.printStackTrace();
-	                return false;
-	            }
-	        } else {
-	            System.out.println("filefile empty");
-	        }
-	        metadata.setIdUtilisateur(idUser);
-			response = Boolean.TRUE;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return response;
-		}
-		
-		return response;
-	}
-	
+//	@PostMapping("/user/document")
+//	public Boolean addDoc(@RequestParam("idUser") Integer idUser, 
+//			@RequestParam("date") String date, @RequestParam("coverage") String coverage, 
+//			@RequestParam("title") String title, @RequestParam("creator") String creator, 
+//			@RequestParam("rights") String rights, @RequestParam("type") String type, 
+//			@RequestParam(name = "url", required = false) String url, 
+//            @RequestParam(name = "file", required = false) MultipartFile file) {
+//		
+//		Boolean response = false;
+//		
+//		try {
+//			Metadata metadata = new Metadata();
+//			metadata.setBibliographicResource("");
+//			metadata.setDescription("");
+//			metadata.setLanguage("");
+//			metadata.setRelation("");
+//			metadata.setSource("");
+//			metadata.setSubject("");
+//			metadata.setFormat("");
+//			metadata.setFileFormat("");
+//			metadata.setIdentifier("");
+//			metadata.setContributor("");
+//			metadata.setPublisher("");
+//			metadata.setType(type);
+//			
+//			metadata.setDate(date);
+//			metadata.setYear(getYear(date));
+//			metadata.setCoverage(coverage);
+//			metadata.setTitle(title);
+//			metadata.setCreator(creator);
+//			metadata.setRights(rights);
+//			
+//			if (null != file && !file.isEmpty()) {
+//	            String additionalName = "";
+//	            additionalName += Calendar.getInstance().getTime().getTime();
+//	            String filename = file.getOriginalFilename().replaceAll("\\s+", "");
+//	            filename = Normalizer.normalize(filename, Normalizer.Form.NFD);
+//	            filename = filename.replaceAll("[^\\p{ASCII}]", "");
+//	            String path = context.getRealPath("/") + File.separator + "resources"
+//	                    + File.separator + "upload" + File.separator + additionalName
+//	                    + filename;
+//	            // Add the url path 
+//	            metadata.setUrl("https://www.lemursporal.org/forum/" + "resources" + "/"
+//	                    + "upload" + "/" + additionalName + filename);
+//	            if (!Files.exists(Paths.get(context.getRealPath("/"), File.separator,
+//	                    "resources", File.separator, "upload"), LinkOption.NOFOLLOW_LINKS)) {
+//	                try {
+//	                    Files.createDirectories(Paths.get(context.getRealPath("/"),
+//	                            File.separator, "resources", File.separator,
+//	                            "upload"));
+//	                } catch (IOException e) {
+//	                    // TODO Auto-generated catch block
+//	                    e.printStackTrace();
+//	                }
+//	            }
+//	            try {
+//	                byte[] bytes = file.getBytes();
+//	                BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(path)));
+//	                stream.write(bytes);
+//	                stream.close();
+//	            } catch (Exception e) {
+//	            	e.printStackTrace();
+//	                return false;
+//	            }
+//	        } else {
+//	            System.out.println("filefile empty");
+//	        }
+//	        metadata.setIdUtilisateur(idUser);
+//			response = Boolean.TRUE;
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return response;
+//		}
+//		
+//		return response;
+//	}
+//	
 	private String getYear(String date) {
 		String[] splited = date.split("-|.|-|_");
 		for (String s : splited) {
@@ -219,7 +231,7 @@ public class MetadataController {
 	}
 	
 	@PostMapping(value = "/secured/document/{filter}")
-    public Boolean submit(@RequestParam("idu") String token, 
+    public Boolean submit(@RequestParam("token") String token, 
     		@RequestParam(name = "bibliographicResource", required = false) String bibliographicResource,
             @RequestParam(name = "url", required = false) String url,
             @RequestParam("date") String date,
@@ -301,16 +313,23 @@ public class MetadataController {
         } catch (NullPointerException npe) {
             // If null, we don't care, we catch it later;
         }
-        for (String s : listSpecies) {
-            AssociationMetadataTaxonomi amt = new AssociationMetadataTaxonomi();
-            try {
-                amt.setId2(Integer.parseInt(s));
-            } catch (Exception e) {
-                continue;
-            }
-            post.addListeAssociationMetadataTaxonomi(amt);
+        
+        if (listSpecies!= null) {
+	        for (String s : listSpecies) {
+	            AssociationMetadataTaxonomi amt = new AssociationMetadataTaxonomi();
+	            try {
+	                amt.setId2(Integer.parseInt(s));
+	            } catch (Exception e) {
+	                continue;
+	            }
+	            post.addListeAssociationMetadataTaxonomi(amt);
+	        }
         }
-        Optional<User> currentUser = userRepository.findById(Integer.getInteger(token.substring(token.indexOf(",.5")+1)));
+//        System.out.println("tralalalalala" + token.substring(token.indexOf(",.5")+3));
+//        System.out.println("tralalalalala" + token);
+//        System.out.println(token.substring(token.indexOf(",.5")+3));
+//        System.out.println(Integer.parseInt(token.substring(token.indexOf(",.5")+3)));
+        Optional<User> currentUser = userRepository.findById(Integer.parseInt(token.substring(token.indexOf(",.5")+3)));
         System.out.println("mail");
         Date now = Calendar.getInstance().getTime();
 
