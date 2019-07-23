@@ -223,7 +223,7 @@ public class MetadataController {
 //	}
 //	
 	private String getYear(String date) {
-		String[] splited = date.split("-|.|-|_|/");
+		String[] splited = date.split("[,.@?!_'/]");
 		for (String s : splited) {
 			if (s.length()==4) return s;
 		}
