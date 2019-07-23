@@ -187,7 +187,7 @@ public class MetadataController {
 //	                    + File.separator + "upload" + File.separator + additionalName
 //	                    + filename;
 //	            // Add the url path 
-//	            metadata.setUrl("https://www.lemursporal.org/forum/" + "resources" + "/"
+//	            metadata.setUrl("https://www.lemursportal.org/forum/" + "resources" + "/"
 //	                    + "upload" + "/" + additionalName + filename);
 //	            if (!Files.exists(Paths.get(context.getRealPath("/"), File.separator,
 //	                    "resources", File.separator, "upload"), LinkOption.NOFOLLOW_LINKS)) {
@@ -223,7 +223,7 @@ public class MetadataController {
 //	}
 //	
 	private String getYear(String date) {
-		String[] splited = date.split("-|.|-|_");
+		String[] splited = date.split("-|.|-|_|/");
 		for (String s : splited) {
 			if (s.length()==4) return s;
 		}
@@ -344,7 +344,7 @@ public class MetadataController {
                     + File.separator + "upload" + File.separator + additionalName
                     + filename;
             // Add the url path 
-            post.setUrl("https://www.lemursporal.org/forum/" + "resources" + "/"
+            post.setUrl("https://www.lemursportal.org/forum/" + "resources" + "/"
                     + "upload" + "/" + additionalName + filename);
             if (!Files.exists(Paths.get(context.getRealPath("/"), File.separator,
                     "resources", File.separator, "upload"), LinkOption.NOFOLLOW_LINKS)) {
