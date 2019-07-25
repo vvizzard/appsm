@@ -1,6 +1,7 @@
 package org.mlp.apps.thematique;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -8,10 +9,12 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
 
 import org.mlp.apps.base.BaseEntity;
+import org.mlp.apps.post.Post;
 import org.mlp.apps.user.User;
 
 @Entity
@@ -54,6 +57,9 @@ public class Thematique extends BaseEntity {
 		inverseJoinColumns= {@JoinColumn(name = "iduser", referencedColumnName = "id")}
 	)
 	private Set<User> managers;
+	
+	@OneToMany(mappedBy="thematique")
+	private List<Post> questions;
 
 	public String getLibelle() {
 		return libelle;

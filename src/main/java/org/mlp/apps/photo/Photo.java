@@ -15,8 +15,10 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.mlp.apps.base.BaseEntity;
 import org.mlp.apps.metadata.Metadata;
+import org.mlp.apps.post.Post;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="photo")
@@ -44,6 +46,11 @@ public class Photo extends BaseEntity {
     
     @Column(name = "id_post", insertable = true, updatable = true)
     private Integer idPost;
+    
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "id_post", insertable = false, updatable = false)
+    private Post post = null;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "id_metadata", insertable = false, updatable = false)
@@ -116,6 +123,14 @@ public class Photo extends BaseEntity {
 
 	public void setBreakpoints(List<PhotoBreakpoint> breakpoints) {
 		this.breakpoints = breakpoints;
+	}
+
+	public Post getPost() {
+		return post;
+	}
+
+	public void setPost(Post post) {
+		this.post = post;
 	}
     
     

@@ -35,6 +35,7 @@ public class UserController {
 		exp.setId(101); //101 is the id of expert
 		List<User> valiny = userTypeRepository.findUser(exp);
 		for (User u : valiny) {
+			u.setPassword("you are not supposed to have access to this data");
 			if (u.getPhotoProfil()==null || u.getPhotoProfil().isEmpty()) {
 				continue;
 			}

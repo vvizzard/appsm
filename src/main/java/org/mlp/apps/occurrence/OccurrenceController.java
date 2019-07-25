@@ -42,7 +42,8 @@ public class OccurrenceController {
 		oc.setPublique(Boolean.TRUE);
 		if(page != null && limite != null && page>= 1 && limite > 0) {
 			Pageable pageable = PageRequest.of(page - 1, limite);
-			return occurrenceRepository.findAll(Example.of(oc), pageable).getContent();
+			return occurrenceRepository.findAll(Example.of(oc), pageable)
+					.getContent();
 		}
 		return occurrenceRepository.findAll(Example.of(oc));
 	}

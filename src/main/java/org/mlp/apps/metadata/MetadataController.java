@@ -265,6 +265,7 @@ public class MetadataController {
             }
         } else if (filter == "photo") {
         	type = "1";
+        	return false;
         } else if (filter == "video") {
         	type = "2";
         } else if (filter == "audio") {
