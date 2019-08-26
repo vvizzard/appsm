@@ -12,6 +12,7 @@ import org.mlp.apps.photo.PhotoRepository;
 import org.mlp.apps.photo.PhotoService;
 import org.mlp.apps.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -58,6 +59,27 @@ public class PostController {
 		
 	}
 	
+	@GetMapping("/public/responses/{id}")
+	public List<Post> getAllResponse(@RequestParam(required = false, 
+			value = "page") Integer page, @RequestParam(required=false, 
+			value="limite") Integer limite, @PathVariable Integer id) {
+		Post temp = new Post();
+		temp.setParentId(id);
+		Example<Post> example = Example.of(temp);
+		
+		if(page != null && limite != null && page>= 1 && limite > 0) {
+			Pageable pageable = PageRequest.of(page - 1, limite);
+			return postRepository.findAll(example, pageable).getContent();
+		}
+		try {
+			Pageable pageable = PageRequest.of(0, 20);
+			return postRepository.findAll(example, pageable).getContent();
+		} catch(NullPointerException npe) {
+			return null;
+		}
+		
+	}
+	
 	@GetMapping("/public/post/{id}")
 	public Optional<Post> findById(@PathVariable Integer id) {
 		return postRepository.findById(id);
@@ -82,6 +104,68 @@ public class PostController {
 		
 		post.setTitle(title);
 		post.setBody(body);
+		post.setCreationDate(Calendar.getInstance().getTime());
+		post.setDeleted(false);
+		post.setThematiqueId(thematiqueId);
+		
+		if (file != null && !file.isEmpty() ) {
+			List<Photo> photos = new ArrayList<>();
+			
+			for (MultipartFile f : file) {
+				Photo photo = new Photo();
+				photo.setIdUser(Integer.getInteger(token.substring(token.indexOf(",.5")+1)));
+				try {
+					photoService.preparePhoto(photo, f.getBytes());
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+				photos.add(photo);
+			}
+			
+			post.setPhotos(photos);
+			post = postRepository.save(post);
+			
+			for (Photo p : post.getPhotos()) {
+				p.setIdPost(post.getId());
+			}
+			post.setPhotos(photoRepository.saveAll(post.getPhotos()));
+			
+			for (Photo p : post.getPhotos()) {
+				for (PhotoBreakpoint pb : p.getBreakpoints()) {
+					pb.setIdPhoto(p.getId());
+				}
+				photoBreakpointRepository.saveAll(p.getBreakpoints());
+			}
+		} else {
+			post = postRepository.save(post);
+		}
+		
+		valiny = true;
+		
+		return valiny;
+	}
+	
+	@PostMapping("/user/answer/{id}")
+	public Boolean postResponse(@RequestParam("token") String token, 
+			@RequestParam("title") String title, @RequestParam("body") String body,
+			@RequestParam("topic") Integer thematiqueId, @PathVariable Integer id,
+			@RequestParam(name = "file", required = false) List<MultipartFile> file) {
+		Boolean valiny = false;
+		
+		Post post = new Post();
+		
+		try {
+			post.setOwnerId(userRepository.findById(Integer.parseInt(
+	        		token.substring(token.indexOf(",.5")+3))).get().getId());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		post.setTitle(title);
+		post.setBody(body);
+		post.setParentId(id);
 		post.setCreationDate(Calendar.getInstance().getTime());
 		post.setDeleted(false);
 		post.setThematiqueId(thematiqueId);
