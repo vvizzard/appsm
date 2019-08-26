@@ -40,6 +40,27 @@ public class OccurrenceController {
 			value="limite") Integer limite) {
 		Occurrence oc = new Occurrence();
 		oc.setPublique(Boolean.TRUE);
+		oc.setValidationexpert(1);
+		if(page != null && limite != null && page>= 1 && limite > 0) {
+			Pageable pageable = PageRequest.of(page - 1, limite);
+			return occurrenceRepository.findAll(Example.of(oc), pageable)
+					.getContent();
+		}
+		return occurrenceRepository.findAll(Example.of(oc));
+	}
+	
+	@GetMapping("/user/myobservations")
+	public List<Occurrence> getAllMySpecies(@RequestParam(required = false, 
+			value = "page") Integer page, @RequestParam(required=false, 
+			value="limite") Integer limite, @RequestParam(name = "token", 
+			required = false) String token) {
+		Occurrence oc = new Occurrence();
+		if(token == null) {
+			return null;
+		} else {
+			oc.setIdUtilisateurUpload(Integer.parseInt(
+	        		token.substring(token.indexOf(",.5")+3)));
+		}
 		if(page != null && limite != null && page>= 1 && limite > 0) {
 			Pageable pageable = PageRequest.of(page - 1, limite);
 			return occurrenceRepository.findAll(Example.of(oc), pageable)
@@ -199,7 +220,13 @@ public class OccurrenceController {
 		
 		OccurrenceSave os = new OccurrenceSave();
 		
-		if( id != null) os.setId( id);
+		if( id != null) {
+			os = occurrenceSaveRepository.findById(id).get();
+			if(os.getIdUtilisateurUpload()!=Integer.parseInt(
+	        		token.substring(token.indexOf(",.5")+3))) {
+				return false;
+			}
+		}
 		if( institutioncode != null) os.setInstitutioncode( institutioncode);
 		if( collectioncode != null) os.setCollectioncode( collectioncode);
 	    if( datasetname != null) os.setDatasetname( datasetname);
