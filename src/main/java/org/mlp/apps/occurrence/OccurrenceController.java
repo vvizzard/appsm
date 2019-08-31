@@ -34,6 +34,9 @@ public class OccurrenceController {
 	@Autowired
 	private SpeciesRepository speciesRepository;
 	
+	@Autowired
+	private OccurrenceService occurrenceService;
+	
 	@GetMapping("/public/observations")
 	public List<Occurrence> getAllSpecies(@RequestParam(required = false, 
 			value = "page") Integer page, @RequestParam(required=false, 
@@ -415,5 +418,12 @@ public class OccurrenceController {
 	    valiny = true;
 	    
 		return valiny;
+	}
+	
+	@PostMapping("user/deleteObservation/{id}")
+	public Boolean delObs(@RequestParam(name = "token", required = true) String token,
+			@PathVariable Integer id) {
+		return occurrenceService.deleteOccurrence(id, Integer.parseInt(
+	        		token.substring(token.indexOf(",.5")+3)));
 	}
 }

@@ -6,7 +6,7 @@ import org.mlp.apps.usertype.UserTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,9 +24,11 @@ public class UserController {
 		return userRepository.findAll();
 	}
 	
-	@GetMapping("/user/{id}")
-	public User getOne(@PathVariable Integer id) {
-		return userRepository.findById(id).get();
+	@GetMapping("/user/detailUser")
+	public User getOne(@RequestParam(name = "token", 
+			required = false) String token) {
+		return userRepository.findById(Integer.parseInt(
+        		token.substring(token.indexOf(",.5")+3))).get();
 	}
 	
 	@GetMapping("/public/experts")
