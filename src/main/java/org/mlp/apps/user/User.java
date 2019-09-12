@@ -83,7 +83,7 @@ public class User extends BaseEntity {
 	)
 	private Set<UserType> roles;
 
-	@JsonIgnore
+//	@JsonIgnore
 	@ManyToMany(fetch=FetchType.EAGER)
 	@JoinTable(
 		name="domaine_expertise", 

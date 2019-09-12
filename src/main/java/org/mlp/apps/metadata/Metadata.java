@@ -2,10 +2,15 @@ package org.mlp.apps.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -16,6 +21,7 @@ import org.mlp.apps.association.AssociationMetadataTaxonomi;
 import org.mlp.apps.association.AssociationMetadataTopic;
 import org.mlp.apps.base.BaseEntity;
 import org.mlp.apps.photo.Photo;
+import org.mlp.apps.thematique.Thematique;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -97,6 +103,14 @@ public class Metadata extends BaseEntity {
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonManagedReference
     private List<Photo> photos = null;
+    
+    @ManyToMany(fetch=FetchType.EAGER)
+	@JoinTable(
+		name="association_metadata_topic", 
+		joinColumns = {@JoinColumn(name="id_metadata", referencedColumnName = "id")},
+		inverseJoinColumns= {@JoinColumn(name = "id_topic", referencedColumnName = "id")}
+	)
+	private Set<Thematique> topic;
     
     @Transient
     private List<AssociationMetadataTopic> listeAssociationMetadataTopic;
@@ -301,6 +315,14 @@ public class Metadata extends BaseEntity {
 
 	public void setPhotos(List<Photo> photos) {
 		this.photos = photos;
+	}
+
+	public Set<Thematique> getTopic() {
+		return topic;
+	}
+
+	public void setTopic(Set<Thematique> topic) {
+		this.topic = topic;
 	}
     
     

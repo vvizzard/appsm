@@ -3,7 +3,6 @@ package org.mlp.apps.occurrence;
 import java.util.List;
 import java.util.Optional;
 
-import org.mlp.apps.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -14,9 +13,6 @@ public class OccurrenceService {
 	
 //	@Autowired
 //	private OccurrenceRepository occurrenceRepository;
-	
-	@Autowired
-	private UserRepository userRepository;
 	
 	@Autowired
 	private OccurrenceSaveRepository occurrenceSaveRepository;

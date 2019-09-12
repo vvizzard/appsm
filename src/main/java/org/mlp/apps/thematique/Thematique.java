@@ -17,6 +17,8 @@ import org.mlp.apps.base.BaseEntity;
 import org.mlp.apps.post.Post;
 import org.mlp.apps.user.User;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="thematique")
 public class Thematique extends BaseEntity {
@@ -50,6 +52,7 @@ public class Thematique extends BaseEntity {
 	@Column(name="deleted_date", nullable=true)
 	private Date deletedDate;
 	
+	@JsonIgnore
 	@ManyToMany(fetch=FetchType.LAZY)
 	@JoinTable(
 		name="domaine_expertise", 

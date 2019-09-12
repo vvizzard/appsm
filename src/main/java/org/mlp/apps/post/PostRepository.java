@@ -29,5 +29,4 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 	  		+ "and (m.censored = false or m.censored is null) ",
 	  nativeQuery = true)
 	public Page<Post> findTopPublication(Pageable pageable);
-
 }
